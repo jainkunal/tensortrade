@@ -4,6 +4,7 @@ from typing import List
 
 import numpy as np
 import pandas as pd
+import random
 
 from gym.spaces import Box, Space
 
@@ -178,6 +179,8 @@ class TensorTradeObserver(Observer):
         The observation history.
     renderer_history : `List[dict]`
         The history of the renderer data feed.
+    warmup_random_periods: bool
+        The warmup period is selected at random, ignore min_periods.
     """
 
     def __init__(self,
@@ -186,6 +189,7 @@ class TensorTradeObserver(Observer):
                  renderer_feed: 'DataFeed' = None,
                  window_size: int = 1,
                  min_periods: int = None,
+                 warmup_random_periods: bool = False,
                  **kwargs) -> None:
         internal_group = Stream.group(_create_internal_streams(portfolio)).rename("internal")
         external_group = Stream.group(feed.inputs).rename("external")
@@ -206,6 +210,7 @@ class TensorTradeObserver(Observer):
 
         self.window_size = window_size
         self.min_periods = min_periods
+        self.warmup_random_periods = warmup_random_periods
 
         self._observation_dtype = kwargs.get('dtype', np.float32)
         self._observation_lows = kwargs.get('observation_lows', -np.inf)
@@ -237,7 +242,14 @@ class TensorTradeObserver(Observer):
     def warmup(self) -> None:
         """Warms up the data feed.
         """
-        if self.min_periods is not None:
+        if self.warmup_random_periods:
+            # TODO(kunaljain): Allow users to specify the max period.
+            period = random.randint(0, 1000)
+            for _ in range(period):
+                if self.has_next():
+                    obs_row = self.feed.next()["external"]
+                    self.history.push(obs_row)
+        elif self.min_periods is not None:
             for _ in range(self.min_periods):
                 if self.has_next():
                     obs_row = self.feed.next()["external"]
