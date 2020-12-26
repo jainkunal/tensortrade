@@ -58,7 +58,8 @@ def create(portfolio: 'Portfolio',
         feed=feed,
         renderer_feed=kwargs.get("renderer_feed", None),
         window_size=window_size,
-        min_periods=min_periods
+        min_periods=min_periods,
+        warmup_random_periods=kwargs.get("warmup_random_periods", False)
     )
 
     stopper = stoppers.MaxLossStopper(
