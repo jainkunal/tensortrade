@@ -4,7 +4,9 @@ services:
     image: tensortrade:latest-gpu
     ports:
       - 8888:8888
+      - 8265:8265  # for ray
     working_dir: /code
     volumes:
       - .:/code
+    shm_size: '2gb'
     command: bash -c "jupyter notebook --ip='*' --port=8888 --no-browser --allow-root ./examples/"

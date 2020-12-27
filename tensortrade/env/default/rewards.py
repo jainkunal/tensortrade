@@ -66,9 +66,10 @@ class SimpleProfit(TensorTradeRewardScheme):
             `window_size` time steps.
         """
         net_worths = [nw['net_worth'] for nw in portfolio.performance.values()]
-        returns = [(b - a) / a for a, b in zip(net_worths[::1], net_worths[1::1])]
-        returns = np.array([x + 1 for x in returns[-self._window_size:]]).cumprod() -1
-        return 0 if len(returns) < 1 else returns[-1]
+        return net_worths[-1] - 10000
+        # returns = [(b - a) / a for a, b in zip(net_worths[::1], net_worths[1::1])]
+        # returns = np.array([x + 1 for x in returns[-self._window_size:]]).cumprod() -1
+        # return 0 if len(returns) < 1 else returns[-1]
 
 
 class RiskAdjustedReturns(TensorTradeRewardScheme):

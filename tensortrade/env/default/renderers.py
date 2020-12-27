@@ -342,6 +342,7 @@ class PlotlyTradingChart(BaseRenderer):
                  auto_open_html: bool = False,
                  include_plotlyjs: Union[bool, str] = 'cdn') -> None:
         super().__init__()
+        self._display = display
         self._height = height
         self._timestamp_format = timestamp_format
         self._save_format = save_format
@@ -505,7 +506,7 @@ class PlotlyTradingChart(BaseRenderer):
         if not self.fig:
             self._create_figure(performance.keys())
 
-        if self._show_chart:  # ensure chart visibility through notebook cell reruns
+        if self._show_chart and self._display:  # ensure chart visibility through notebook cell reruns
             display(self.fig)
             self._show_chart = False
 
@@ -525,7 +526,8 @@ class PlotlyTradingChart(BaseRenderer):
 
         self._net_worth_chart.update({'y': net_worth})
 
-        self.fig.show()
+        if self._display:
+            self.fig.show()
 
 
     def save(self) -> None:
